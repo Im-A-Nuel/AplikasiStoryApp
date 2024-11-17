@@ -4,19 +4,32 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
-import androidx.activity.enableEdgeToEdge
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.coding.aplikasistoryapp.R
+import androidx.lifecycle.lifecycleScope
+import com.coding.aplikasistoryapp.data.UserRepository
+import com.coding.aplikasistoryapp.data.remote.response.ErrorResponse
 import com.coding.aplikasistoryapp.databinding.ActivityRegisterBinding
+import com.coding.aplikasistoryapp.di.Injection
+import com.google.android.material.textfield.TextInputEditText
+import com.google.gson.Gson
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
+
+    private val repository: UserRepository = Injection.provideUserRepository(this)
+
+    private lateinit var name: TextInputEditText
+    private lateinit var email: TextInputEditText
+    private lateinit var password: TextInputEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +38,84 @@ class RegisterActivity : AppCompatActivity() {
 
         setupView()
         playAnimation()
+
+        name = binding.nameEditText
+        email = binding.emailEditText
+        email.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
+                val input = s.toString()
+
+                if (input.matches(emailPattern.toRegex())) {
+                    email.error = null
+                } else {
+                    email.error = "Format email tidak valid"
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
+
+        password = binding.passwordEditText
+        password.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.toString().length < 8) {
+                    password.setError("Password tidak boleh kurang dari 8 karakter", null)
+                } else {
+                    password.error = null
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+
+        binding.signupButton.setOnClickListener {
+            val nameText = name.text.toString()
+            val emailText = email.text.toString()
+            val passText = password.text.toString()
+
+            showLoading(true)
+
+            println("name $nameText")
+            println("email $emailText")
+            println("pass $passText")
+
+            lifecycleScope.launch {
+            try {
+                val message = repository.register(
+                    nameText,
+                    emailText,
+                    passText
+                )
+
+                if (message.error != true) {
+                    showLoading(false)
+                    showSuccess(message.message.toString())
+                } else {
+                    showLoading(false)
+                    showError(message.message.toString())
+                }
+            } catch (e: HttpException) {
+                val jsonInString = e.response()?.errorBody()?.string()
+                val errorBody = Gson().fromJson(jsonInString, ErrorResponse::class.java)
+                val errorMessage = errorBody.message
+                showError(errorMessage.toString())
+                showLoading(false)
+                }
+            }
+        }
     }
 
     private fun playAnimation() {
@@ -49,6 +140,14 @@ class RegisterActivity : AppCompatActivity() {
         }.start()
     }
 
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showSuccess(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
     private fun setupView() {
         @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -60,5 +159,9 @@ class RegisterActivity : AppCompatActivity() {
             )
         }
         supportActionBar?.hide()
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 }

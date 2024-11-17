@@ -1,4 +1,4 @@
-package com.coding.aplikasistoryapp.view.main
+package com.coding.aplikasistoryapp.view.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,13 +8,13 @@ import androidx.lifecycle.viewModelScope
 import com.coding.aplikasistoryapp.data.StoryRepository
 import com.coding.aplikasistoryapp.data.UserRepository
 import com.coding.aplikasistoryapp.data.pref.UserModel
-import com.coding.aplikasistoryapp.data.remote.response.StoryResponse
+import com.coding.aplikasistoryapp.data.remote.response.DetailResponse
 import kotlinx.coroutines.launch
 
-class MainViewModel (private val repository: UserRepository, private val storyRepository: StoryRepository): ViewModel() {
+class DetailViewModel(private val repository: UserRepository, private val storyRepository: StoryRepository): ViewModel() {
 
-    private val _listStory = MutableLiveData<StoryResponse?>()
-    val listStory: MutableLiveData<StoryResponse?> = _listStory
+    private val _detailStory = MutableLiveData<DetailResponse?>()
+    val detailStory: MutableLiveData<DetailResponse?> = _detailStory
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -22,16 +22,12 @@ class MainViewModel (private val repository: UserRepository, private val storyRe
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    init {
-        getAllStory()
-    }
-
-    private fun getAllStory() {
+    fun getDetailStory(id: String) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val response = storyRepository.getStories()
-                _listStory.value = response
+                val response = storyRepository.getStoriesById(id)
+                _detailStory.value = response
                 _errorMessage.value = null
             } catch (e: Exception) {
                 _errorMessage.value = e.message
@@ -41,17 +37,7 @@ class MainViewModel (private val repository: UserRepository, private val storyRe
         }
     }
 
-    fun refreshStories() {
-        getAllStory()
-    }
-
     fun getSession(): LiveData<UserModel> {
         return repository.getSession().asLiveData()
-    }
-
-    fun logOut() {
-        viewModelScope.launch {
-            repository.logout()
-        }
     }
 }
