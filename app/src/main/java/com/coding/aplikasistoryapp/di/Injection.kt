@@ -12,20 +12,15 @@ import kotlinx.coroutines.runBlocking
 object Injection {
     fun provideUserRepository(context: Context): UserRepository {
         val pref = UserPreference.getInstance(context.dataStore)
-        val token = runBlocking { pref.getSession().first().token }
-
-        val apiService = if (token.isNotEmpty()) {
-            ApiConfig.getApiService(token)
-        } else {
-            ApiConfig.getApiServiceWithoutToken()
-        }
+        val session = runBlocking { pref.getSession().first() }
+        val apiService = ApiConfig.getApiService(session.token)
         return UserRepository.getInstance(apiService, pref)
     }
 
     fun provideStoryRepository(context: Context): StoryRepository {
         val pref = UserPreference.getInstance(context.dataStore)
-        val user = runBlocking { pref.getSession().first() }
-        val apiService = ApiConfig.getApiService(user.token)
+        val session = runBlocking { pref.getSession().first() }
+        val apiService = ApiConfig.getApiService(session.token)
         return StoryRepository.getInstance(apiService, pref)
     }
 }

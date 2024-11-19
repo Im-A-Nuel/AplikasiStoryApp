@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -56,6 +57,8 @@ class MainActivity : AppCompatActivity() {
             if (!user.isLogin) {
                 startActivity(Intent(this, WelcomeActivity::class.java))
                 finish()
+            } else {
+                observeStory()
             }
         }
 
@@ -67,8 +70,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.rvStory.adapter = storyAdapter
         binding.rvStory.layoutManager = LinearLayoutManager(this)
-
-        observeStory()
 
         binding.fabAdd.setOnClickListener {
             val intent = Intent(this@MainActivity, AddStoryActivity::class.java)
@@ -123,6 +124,10 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_logout -> {
                 viewModel.logOut()
+                true
+            }
+            R.id.action_setting -> {
+                startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
                 true
             }
             else -> super.onOptionsItemSelected(item)

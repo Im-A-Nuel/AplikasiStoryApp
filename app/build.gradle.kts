@@ -73,4 +73,6 @@ dependencies {
 
     // glide
     implementation(libs.glide)
+    annotationProcessor(libs.compiler)  // or latest version
+
 }

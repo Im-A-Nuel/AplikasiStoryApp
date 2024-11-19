@@ -21,7 +21,18 @@ class UserRepository private constructor(
     }
 
     suspend fun login(email: String, password: String): LoginResponse {
-        return apiService.login(email, password)
+        val response = apiService.login(email, password)
+
+        val loginResult = response.loginResult ?: throw IllegalStateException("Login result is null")
+        val userModel = UserModel(
+            userId = loginResult.userId ?: "",
+            name = loginResult.name ?: "",
+            token = loginResult.token ?: "",
+            isLogin = true
+        )
+        saveSession(userModel)
+
+        return response
     }
 
     suspend fun register(name: String, email: String, password: String): RegisterResponse {

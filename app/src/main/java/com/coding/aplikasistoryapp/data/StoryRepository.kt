@@ -42,7 +42,6 @@ class StoryRepository private constructor(
         }
     }
 
-
     companion object {
         @Volatile
         private var instance: StoryRepository? = null

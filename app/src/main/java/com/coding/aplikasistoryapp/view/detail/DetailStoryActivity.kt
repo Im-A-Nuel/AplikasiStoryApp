@@ -24,6 +24,8 @@ class DetailStoryActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
+        supportActionBar?.title = getString(R.string.detail_story)
+
         val storyId = intent.getStringExtra(EXTRA_ID)
         if (storyId != null) {
             if (storyId.isNotEmpty()) {

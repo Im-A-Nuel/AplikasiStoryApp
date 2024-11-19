@@ -12,9 +12,7 @@ class ApiConfig {
         private const val BASE_URL = BuildConfig.BASE_URL
 
         fun getApiService(token: String): ApiService {
-            val loggingInterceptor = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }
+            val loggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
             val authInterceptor = Interceptor { chain ->
                 val req = chain.request()
                 val requestHeaders = req.newBuilder()
@@ -35,24 +33,5 @@ class ApiConfig {
 
             return retrofit.create(ApiService::class.java)
         }
-
-        fun getApiServiceWithoutToken(): ApiService {
-            val loggingInterceptor = HttpLoggingInterceptor().apply {
-                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
-            }
-
-            val client = OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor)
-                .build()
-
-            val retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build()
-
-            return retrofit.create(ApiService::class.java)
-        }
-
     }
 }

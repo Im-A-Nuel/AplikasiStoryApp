@@ -25,11 +25,10 @@ class StoryAdapter(private val onItemClicked: (ListStoryItem) -> Unit) : ListAda
 
                 Glide.with(itemView.context)
                     .load(story.photoUrl)
-                    .placeholder(R.drawable.ic_place_holder) // Optional placeholder image
-                    .error(R.drawable.ic_place_holder) // Optional error image
+                    .placeholder(R.drawable.ic_place_holder)
+                    .error(R.drawable.ic_place_holder)
                     .into(imgItemPhoto)
 
-                // Set click listener if needed
                 root.setOnClickListener {
                     val id = story.id
                     val intent = Intent(it.context, DetailStoryActivity::class.java)

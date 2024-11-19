@@ -2,6 +2,7 @@ package com.coding.aplikasistoryapp.view.register
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -10,12 +11,14 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.coding.aplikasistoryapp.data.UserRepository
 import com.coding.aplikasistoryapp.data.remote.response.ErrorResponse
 import com.coding.aplikasistoryapp.databinding.ActivityRegisterBinding
 import com.coding.aplikasistoryapp.di.Injection
+import com.coding.aplikasistoryapp.view.welcome.WelcomeActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -41,58 +44,64 @@ class RegisterActivity : AppCompatActivity() {
 
         name = binding.nameEditText
         email = binding.emailEditText
-        email.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
-                val input = s.toString()
-
-                if (input.matches(emailPattern.toRegex())) {
-                    email.error = null
-                } else {
-                    email.error = "Format email tidak valid"
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-        })
-
         password = binding.passwordEditText
-        password.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (s.toString().length < 8) {
-                    password.setError("Password tidak boleh kurang dari 8 karakter", null)
-                } else {
-                    password.error = null
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-        })
+        email.addTextChangedListener(inputTextWatcher)
+        password.addTextChangedListener(inputTextWatcher)
 
         binding.signupButton.setOnClickListener {
-            val nameText = name.text.toString()
-            val emailText = email.text.toString()
-            val passText = password.text.toString()
+            register()
+        }
 
-            showLoading(true)
+        binding.signupButton.isEnabled = false
+    }
 
-            println("name $nameText")
-            println("email $emailText")
-            println("pass $passText")
+    private val inputTextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            lifecycleScope.launch {
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            checkFormValidity()
+        }
+
+        override fun afterTextChanged(s: Editable?) {}
+    }
+
+    private fun checkFormValidity() {
+        val emailInput = email.text.toString()
+        val passwordInput = password.text.toString()
+
+        val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()
+        val isPasswordValid = passwordInput.length >= 8
+
+        // Aktifkan tombol login jika semua validasi terpenuhi
+        binding.signupButton.isEnabled = isEmailValid && isPasswordValid
+
+        // Set error jika ada input yang tidak valid
+        if (!isEmailValid && emailInput.isNotEmpty()) {
+            email.error = "Format email tidak valid"
+        } else {
+            email.error = null
+        }
+
+        if (!isPasswordValid && passwordInput.isNotEmpty()) {
+            password.error = "Password minimal 8 karakter"
+        } else {
+            password.error = null
+        }
+    }
+
+    private fun register() {
+        val nameText = name.text.toString()
+        val emailText = email.text.toString()
+        val passText = password.text.toString()
+
+        showLoading(true)
+
+        println("name $nameText")
+        println("email $emailText")
+        println("pass $passText")
+
+        lifecycleScope.launch {
             try {
                 val message = repository.register(
                     nameText,
@@ -103,6 +112,19 @@ class RegisterActivity : AppCompatActivity() {
                 if (message.error != true) {
                     showLoading(false)
                     showSuccess(message.message.toString())
+                    AlertDialog.Builder(this@RegisterActivity).apply {
+                        setTitle("Yess!")
+                        setMessage("Akun Anda berhasil dibuat. login dan coba bagikan story?")
+                        setPositiveButton("login") { _, _ ->
+                            val intent = Intent(context, WelcomeActivity::class.java)
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                            finish()
+                        }
+                        create()
+                        show()
+                    }
                 } else {
                     showLoading(false)
                     showError(message.message.toString())
@@ -113,7 +135,6 @@ class RegisterActivity : AppCompatActivity() {
                 val errorMessage = errorBody.message
                 showError(errorMessage.toString())
                 showLoading(false)
-                }
             }
         }
     }

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
@@ -32,6 +33,11 @@ class AddStoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAddStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        supportActionBar?.title = getString(R.string.add_story)
 
         if (!allPermissionsGranted()) {
             requestPermissionLauncher.launch(REQUIRED_PERMISSION)
@@ -92,15 +98,14 @@ class AddStoryActivity : AppCompatActivity() {
 
     private fun uploadStory() {
         val description = binding.descriptionText.text.toString()
-
         viewModel.currentImageUri.value?.let { uri ->
             showLoading(true)
             val imageFile = uriToFile(uri, this).reduceFileImage()
 
             viewModel.uploadImage(imageFile, description).observe(this) { result ->
-                showLoading(false)
                 if (result != null) {
                     if (!result.error) {
+                        showLoading(false)
                         showToast(getString(R.string.upload_success))
                         setResult(Activity.RESULT_OK)
                         finish()
@@ -142,6 +147,16 @@ class AddStoryActivity : AppCompatActivity() {
                 Toast.makeText(this, "Permission request denied", Toast.LENGTH_LONG).show()
             }
         }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     companion object {
         private const val REQUIRED_PERMISSION = Manifest.permission.CAMERA

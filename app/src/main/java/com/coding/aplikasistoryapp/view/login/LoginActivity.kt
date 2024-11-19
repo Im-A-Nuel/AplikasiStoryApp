@@ -14,7 +14,10 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.coding.aplikasistoryapp.R
 import com.coding.aplikasistoryapp.data.pref.UserModel
+import com.coding.aplikasistoryapp.data.pref.UserPreference
+import com.coding.aplikasistoryapp.data.pref.dataStore
 import com.coding.aplikasistoryapp.databinding.ActivityLoginBinding
 import com.coding.aplikasistoryapp.view.ViewModelFactory
 import com.coding.aplikasistoryapp.view.main.MainActivity
@@ -39,82 +42,74 @@ class LoginActivity : AppCompatActivity() {
         playAnimation()
 
         email = binding.emailEditText
-        email.addTextChangedListener(object : TextWatcher {
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
-                val input = s.toString()
-
-                if (input.matches(emailPattern.toRegex())) {
-                    email.error = null
-                } else {
-                    email.error = "Format email tidak valid"
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-        })
-
         password = binding.passwordEditText
-        password.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (s.toString().length < 8) {
-                    password.setError("Password tidak boleh kurang dari 8 karakter", null)
-                } else {
-                    password.error = null
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-        })
-
+        email.addTextChangedListener(inputTextWatcher)
+        password.addTextChangedListener(inputTextWatcher)
 
         binding.loginButton.setOnClickListener {
             val emailText = email.text.toString()
             val passText = password.text.toString()
-            println("email $emailText")
-            println("pass $passText")
             performLogin(emailText, passText)
+        }
+
+        binding.loginButton.isEnabled = false
+    }
+
+    private val inputTextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            checkFormValidity()
+        }
+
+        override fun afterTextChanged(s: Editable?) {}
+    }
+
+    private fun checkFormValidity() {
+        val emailInput = email.text.toString()
+        val passwordInput = password.text.toString()
+
+        val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()
+        val isPasswordValid = passwordInput.length >= 8
+
+        binding.loginButton.isEnabled = isEmailValid && isPasswordValid
+
+        if (!isEmailValid && emailInput.isNotEmpty()) {
+            email.error = getString(R.string.invalid_format_email)
+        } else {
+            email.error = null
+        }
+
+        if (!isPasswordValid && passwordInput.isNotEmpty()) {
+            password.error = getString(R.string.invalid_format_password)
+        } else {
+            password.error = null
         }
     }
 
     private fun performLogin(email: String, password: String) {
-
         loginViewModel.isLoading.observe(this) { isLoading ->
             showLoading(isLoading)
         }
 
-        loginViewModel.login(email, password) // Panggil login untuk memulai proses
+        loginViewModel.login(email, password)
 
         loginViewModel.loginResult.observe(this) { result ->
             if (result != null) {
-                println("Data diterima di Activity: $result")
                 if (result.error != true) {
                     val user = result.loginResult
                     if (user != null) {
-                        // Simpan sesi pengguna
                         loginViewModel.saveSession(
-                            UserModel(user.name ?: "", user.token ?: "", true)
+                            UserModel(user.userId ?: "", user.name ?: "", user.token ?: "", true)
                         )
                         AlertDialog.Builder(this).apply {
                             setTitle("Yess!")
-                            setMessage("Anda berhasil login. Sudah tidak sabar berbagi cerita?")
+                            setMessage(getString(R.string.message_login))
                             setPositiveButton("Lanjut") { _, _ ->
                                 val intent = Intent(context, MainActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                                intent.flags =
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                                 startActivity(intent)
                                 finish()
                             }
@@ -122,18 +117,16 @@ class LoginActivity : AppCompatActivity() {
                             show()
                         }
                     } else {
-                        Toast.makeText(this, "Data login tidak valid", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.login_valid), Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(this, "Login gagal ${result.message}", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "Gagal login: Tidak ada respons hehe", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.login_valid), Toast.LENGTH_SHORT).show()
             }
         }
     }
-
-
 
     private fun playAnimation() {
         ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
@@ -168,7 +161,6 @@ class LoginActivity : AppCompatActivity() {
         }
         supportActionBar?.hide()
     }
-
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE

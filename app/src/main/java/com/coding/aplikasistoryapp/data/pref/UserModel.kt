@@ -1,7 +1,8 @@
 package com.coding.aplikasistoryapp.data.pref
 
 data class UserModel(
-    val email: String,
+    val userId: String,
+    val name: String,
     val token: String,
     val isLogin: Boolean = false
 )
