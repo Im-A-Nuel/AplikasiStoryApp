@@ -4,8 +4,10 @@ import androidx.lifecycle.liveData
 import com.coding.aplikasistoryapp.data.pref.UserPreference
 import com.coding.aplikasistoryapp.data.remote.api.ApiService
 import com.coding.aplikasistoryapp.data.remote.response.DetailResponse
+import com.coding.aplikasistoryapp.data.remote.response.StoryResponse
 import com.coding.aplikasistoryapp.data.remote.response.UploadResponse
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.first
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -18,13 +20,21 @@ class StoryRepository private constructor(
     private val userPreference: UserPreference
 ) {
 
-    suspend fun getStories() = apiService.getStories()
+    suspend fun getStories(): StoryResponse {
+        val session = userPreference.getSession().first()
+        val token = "Bearer ${session.token}" // Pastikan format token sesuai dengan API
+        return apiService.getStories(token)
+    }
 
     suspend fun getStoriesById(id: String): DetailResponse {
-        return apiService.getDetailStories(id)
+        val session = userPreference.getSession().first()
+        val token = "Bearer ${session.token}"
+        return apiService.getDetailStories(id, token)
     }
 
     fun uploadImage(imageFile: File, description: String) = liveData<UploadResponse> {
+        val session = userPreference.getSession().first()
+        val token = "Bearer ${session.token}"
         val requestBody = description.toRequestBody("text/plain".toMediaType())
         val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
         val multipartBody = MultipartBody.Part.createFormData(
@@ -33,7 +43,7 @@ class StoryRepository private constructor(
             requestImageFile
         )
         try {
-            val successResponse = apiService.uploadImage(multipartBody, requestBody)
+            val successResponse = apiService.uploadImage(multipartBody, requestBody, token)
             emit(successResponse)
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

@@ -11,8 +11,6 @@
     <string name="message_login_page">Please enter your details</string>
     <string name="title_login_page">Can\'t wait to explore and share stories?</string>
     <string name="name">Name</string>
-    <string name="message_main_page">Happy Learning at Dicoding.</string>
-    <string name="greeting">Hello %1$s,</string>
     <string name="logout">Log Out</string>
     <string name="storyimage">Story Image</string>
     <string name="judul_cerita">Story Title</string>
@@ -26,10 +24,8 @@
     <string name="upload_success">Successfully added the story!</string>
     <string name="upload_failed">Failed to add the story!</string>
     <string name="error_occurred">Error!!</string>
-    <string name="tidak_ada_deskripsi">No description</string>
     <string name="appwidget_text">Story Widget</string>
     <string name="empty_text">NO DATA</string>
-    <string name="app_widget_description">This is an app widget description</string>
     <string name="pengaturan_bahasa">Language Settings</string>
     <string name="message_login">You have successfully logged in. Can\'t wait to share your story?</string>
     <string name="invalid_format_email">Invalid email format</string>

@@ -5,8 +5,6 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
@@ -14,14 +12,14 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import com.coding.aplikasistoryapp.R
 import com.coding.aplikasistoryapp.data.pref.UserModel
-import com.coding.aplikasistoryapp.data.pref.UserPreference
-import com.coding.aplikasistoryapp.data.pref.dataStore
 import com.coding.aplikasistoryapp.databinding.ActivityLoginBinding
+import com.coding.aplikasistoryapp.util.CustomEmailEditText
+import com.coding.aplikasistoryapp.util.CustomPasswordEditText
 import com.coding.aplikasistoryapp.view.ViewModelFactory
 import com.coding.aplikasistoryapp.view.main.MainActivity
-import com.google.android.material.textfield.TextInputEditText
 
 class LoginActivity : AppCompatActivity() {
 
@@ -30,8 +28,8 @@ class LoginActivity : AppCompatActivity() {
         ViewModelFactory.getInstance(this)
     }
 
-    private lateinit var email: TextInputEditText
-    private lateinit var password: TextInputEditText
+    private lateinit var email: CustomEmailEditText
+    private lateinit var password: CustomPasswordEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +42,6 @@ class LoginActivity : AppCompatActivity() {
         email = binding.emailEditText
         password = binding.passwordEditText
 
-        email.addTextChangedListener(inputTextWatcher)
-        password.addTextChangedListener(inputTextWatcher)
-
         binding.loginButton.setOnClickListener {
             val emailText = email.text.toString()
             val passText = password.text.toString()
@@ -54,38 +49,18 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.loginButton.isEnabled = false
+
+        email.addTextChangedListener{ checkFormValidity(email, password) }
+        password.addTextChangedListener { checkFormValidity(email, password) }
     }
 
-    private val inputTextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            checkFormValidity()
-        }
-
-        override fun afterTextChanged(s: Editable?) {}
-    }
-
-    private fun checkFormValidity() {
-        val emailInput = email.text.toString()
-        val passwordInput = password.text.toString()
-
-        val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()
-        val isPasswordValid = passwordInput.length >= 8
-
+    private fun checkFormValidity(
+        email: CustomEmailEditText,
+        password: CustomPasswordEditText,
+    ) {
+        val isEmailValid = email.error == null && email.text?.isNotEmpty() == true
+        val isPasswordValid = password.error == null && password.text?.isNotEmpty() == true
         binding.loginButton.isEnabled = isEmailValid && isPasswordValid
-
-        if (!isEmailValid && emailInput.isNotEmpty()) {
-            email.error = getString(R.string.invalid_format_email)
-        } else {
-            email.error = null
-        }
-
-        if (!isPasswordValid && passwordInput.isNotEmpty()) {
-            password.error = getString(R.string.invalid_format_password)
-        } else {
-            password.error = null
-        }
     }
 
     private fun performLogin(email: String, password: String) {

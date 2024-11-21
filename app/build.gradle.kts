@@ -60,11 +60,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.activity.ktx)
 
-    // camera X
-    implementation(libs.androidx.camera.camera2)
-    implementation(libs.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
-
     // retrofit - api
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -73,6 +68,6 @@ dependencies {
 
     // glide
     implementation(libs.glide)
-    annotationProcessor(libs.compiler)  // or latest version
+    annotationProcessor(libs.compiler)
 
 }

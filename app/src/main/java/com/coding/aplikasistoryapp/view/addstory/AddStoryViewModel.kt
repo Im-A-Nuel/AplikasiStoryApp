@@ -17,13 +17,10 @@ class AddStoryViewModel(
 ) : ViewModel() {
 
     private val _uploadResult = MutableLiveData<UploadResponse>()
-    var uploadResult: LiveData<UploadResponse> = _uploadResult
+    private var uploadResult: LiveData<UploadResponse> = _uploadResult
 
     private val _currentImageUri = MutableLiveData<Uri?>()
     val currentImageUri: LiveData<Uri?> get() = _currentImageUri
-
-    private val _lastImageUri = MutableLiveData<Uri?>()
-    val lastImageUri: LiveData<Uri?> get() = _lastImageUri
 
     private val _description = MutableLiveData<String>()
     val description: LiveData<String> get() = _description

@@ -1,7 +1,6 @@
 package com.coding.aplikasistoryapp.data.remote.api
 
 import com.coding.aplikasistoryapp.BuildConfig
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -11,18 +10,12 @@ class ApiConfig {
     companion object {
         private const val BASE_URL = BuildConfig.BASE_URL
 
-        fun getApiService(token: String): ApiService {
-            val loggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-            val authInterceptor = Interceptor { chain ->
-                val req = chain.request()
-                val requestHeaders = req.newBuilder()
-                    .addHeader("Authorization", "Bearer $token")
-                    .build()
-                chain.proceed(requestHeaders)
+        fun getApiService(): ApiService {
+            val loggingInterceptor = HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
             }
             val client = OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
-                .addInterceptor(authInterceptor)
                 .build()
 
             val retrofit = Retrofit.Builder()
@@ -35,3 +28,4 @@ class ApiConfig {
         }
     }
 }
+

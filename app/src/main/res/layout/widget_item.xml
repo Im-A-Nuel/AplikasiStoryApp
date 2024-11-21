@@ -25,7 +25,7 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:contentDescription="@string/storyimage"
-        tools:srcCompat="@drawable/image_welcome" />
+        tools:srcCompat="@drawable/welcome_image" />
 
 
 </LinearLayout>

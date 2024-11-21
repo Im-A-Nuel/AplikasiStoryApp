@@ -9,4 +9,7 @@
     <color name="light_blue_900">#FF01579B</color>
     <color name="pink_500">#D81B60</color>
     <color name="pink_200">#FF8FAF</color>
+    <color name="yellow">#F6D57F</color>
+    <color name="gold">#CA9F0F</color>
+    <color name="brown">#BC9015</color>
 </resources>

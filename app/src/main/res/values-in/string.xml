@@ -11,8 +11,6 @@
     <string name="message_login_page">Masukkan dulu datamu ya</string>
     <string name="title_login_page">Sudah tidak sabar ingin explore dan berbagi cerita?</string>
     <string name="name">Nama</string>
-    <string name="message_main_page">Selamat Belajar di Dicoding.</string>
-    <string name="greeting">Halo %1$s,</string>
     <string name="logout">Keluar</string>
     <string name="storyimage">gambar cerita</string>
     <string name="judul_cerita">Judul Cerita</string>
@@ -26,10 +24,8 @@
     <string name="upload_success">Berhasil menambahkan cerita!</string>
     <string name="upload_failed">Gagal menambahkan cerita!</string>
     <string name="error_occurred">Erorr!!</string>
-    <string name="tidak_ada_deskripsi">Tidak ada deskripsi</string>
     <string name="appwidget_text">Widget Story</string>
     <string name="empty_text">NO DATA</string>
-    <string name="app_widget_description">This is an app widget description</string>
     <string name="pengaturan_bahasa">Pengaturan Bahasa</string>
     <string name="message_login">Anda berhasil login. Sudah tidak sabar berbagi cerita?</string>
     <string name="invalid_format_email">Format email tidak valid</string>

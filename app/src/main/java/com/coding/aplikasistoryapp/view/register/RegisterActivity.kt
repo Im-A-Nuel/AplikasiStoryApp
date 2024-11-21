@@ -5,19 +5,20 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.coding.aplikasistoryapp.data.UserRepository
 import com.coding.aplikasistoryapp.data.remote.response.ErrorResponse
 import com.coding.aplikasistoryapp.databinding.ActivityRegisterBinding
 import com.coding.aplikasistoryapp.di.Injection
+import com.coding.aplikasistoryapp.util.CustomEmailEditText
+import com.coding.aplikasistoryapp.util.CustomPasswordEditText
 import com.coding.aplikasistoryapp.view.welcome.WelcomeActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
@@ -31,8 +32,8 @@ class RegisterActivity : AppCompatActivity() {
     private val repository: UserRepository = Injection.provideUserRepository(this)
 
     private lateinit var name: TextInputEditText
-    private lateinit var email: TextInputEditText
-    private lateinit var password: TextInputEditText
+    private lateinit var email: CustomEmailEditText
+    private lateinit var password: CustomPasswordEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,8 +47,8 @@ class RegisterActivity : AppCompatActivity() {
         email = binding.emailEditText
         password = binding.passwordEditText
 
-        email.addTextChangedListener(inputTextWatcher)
-        password.addTextChangedListener(inputTextWatcher)
+        email.addTextChangedListener { checkFormValidity(email, password) }
+        password.addTextChangedListener { checkFormValidity(email, password) }
 
         binding.signupButton.setOnClickListener {
             register()
@@ -56,38 +57,13 @@ class RegisterActivity : AppCompatActivity() {
         binding.signupButton.isEnabled = false
     }
 
-    private val inputTextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            checkFormValidity()
-        }
-
-        override fun afterTextChanged(s: Editable?) {}
-    }
-
-    private fun checkFormValidity() {
-        val emailInput = email.text.toString()
-        val passwordInput = password.text.toString()
-
-        val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()
-        val isPasswordValid = passwordInput.length >= 8
-
-        // Aktifkan tombol login jika semua validasi terpenuhi
+    private fun checkFormValidity(
+        email: CustomEmailEditText,
+        password: CustomPasswordEditText,
+    ) {
+        val isEmailValid = email.error == null && email.text?.isNotEmpty() == true
+        val isPasswordValid = password.error == null && password.text?.isNotEmpty() == true
         binding.signupButton.isEnabled = isEmailValid && isPasswordValid
-
-        // Set error jika ada input yang tidak valid
-        if (!isEmailValid && emailInput.isNotEmpty()) {
-            email.error = "Format email tidak valid"
-        } else {
-            email.error = null
-        }
-
-        if (!isPasswordValid && passwordInput.isNotEmpty()) {
-            password.error = "Password minimal 8 karakter"
-        } else {
-            password.error = null
-        }
     }
 
     private fun register() {
