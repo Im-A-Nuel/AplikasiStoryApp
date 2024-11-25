@@ -1,6 +1,12 @@
 <!-- res/menu/main_menu.xml -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_maps"
+        android:icon="@drawable/ic_map_24"
+        android:title=""
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_logout"
         android:title="@string/logout"
@@ -9,4 +15,5 @@
         android:id="@+id/action_setting"
         android:title="@string/pengaturan_bahasa"
         app:showAsAction="never" />
+
 </menu>

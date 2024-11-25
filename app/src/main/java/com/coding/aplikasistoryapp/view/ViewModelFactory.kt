@@ -11,6 +11,7 @@ import com.coding.aplikasistoryapp.view.addstory.AddStoryViewModel
 import com.coding.aplikasistoryapp.view.detail.DetailViewModel
 import com.coding.aplikasistoryapp.view.login.LoginViewModel
 import com.coding.aplikasistoryapp.view.main.MainViewModel
+import com.coding.aplikasistoryapp.view.map.MapsViewModel
 
 class ViewModelFactory(private val userRepository: UserRepository, private  val storyRepository: StoryRepository) : ViewModelProvider.NewInstanceFactory() {
 
@@ -28,6 +29,9 @@ class ViewModelFactory(private val userRepository: UserRepository, private  val 
             }
             modelClass.isAssignableFrom(AddStoryViewModel::class.java) -> {
                 AddStoryViewModel(userRepository, storyRepository) as T
+            }
+            modelClass.isAssignableFrom(MapsViewModel::class.java) -> {
+                MapsViewModel(userRepository, storyRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
         }

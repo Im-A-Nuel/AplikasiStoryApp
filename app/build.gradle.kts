@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -48,6 +50,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.maps)
+    implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,5 +73,13 @@ dependencies {
     // glide
     implementation(libs.glide)
     annotationProcessor(libs.compiler)
+    implementation(libs.androidx.paging.runtime.ktx)
+
+    // room
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.room.compiler)
+
+    // paging
+    implementation(libs.androidx.room.paging)
 
 }

@@ -14,13 +14,16 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.coding.aplikasistoryapp.R
-import com.coding.aplikasistoryapp.data.remote.response.StoryResponse
+import com.coding.aplikasistoryapp.adapter.LoadingStateAdapter
 import com.coding.aplikasistoryapp.databinding.ActivityMainBinding
 import com.coding.aplikasistoryapp.view.ViewModelFactory
 import com.coding.aplikasistoryapp.view.addstory.AddStoryActivity
 import com.coding.aplikasistoryapp.view.detail.DetailStoryActivity
+import com.coding.aplikasistoryapp.view.map.MapsActivity
 import com.coding.aplikasistoryapp.view.welcome.WelcomeActivity
 
 class MainActivity : AppCompatActivity() {
@@ -41,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            viewModel.refreshStories()
+            observeStory()
         }
     }
 
@@ -53,6 +56,21 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupObservers()
+        setupView()
+        getData()
+
+        storyAdapter = StoryAdapter { story ->
+            story.id?.let { openDetailActivity(it) }
+        }
+
+        binding.fabAdd.setOnClickListener {
+            val intent = Intent(this@MainActivity, AddStoryActivity::class.java)
+            launcherAddStory.launch(intent)
+        }
+    }
+
+    private fun setupObservers() {
         viewModel.getSession().observe(this) { user ->
             if (!user.isLogin) {
                 startActivity(Intent(this, WelcomeActivity::class.java))
@@ -62,28 +80,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        setupView()
-
-        storyAdapter = StoryAdapter { story ->
-            story.id?.let { openDetailActivity(it) }
-        }
-
-        binding.rvStory.adapter = storyAdapter
-        binding.rvStory.layoutManager = LinearLayoutManager(this)
-
-        binding.fabAdd.setOnClickListener {
-            val intent = Intent(this@MainActivity, AddStoryActivity::class.java)
-            launcherAddStory.launch(intent)
-        }
-    }
-
-    private fun observeStory() {
-        viewModel.listStory.observe(this) { response ->
-            response?.let { setStories(it) }
-        }
-        viewModel.isLoading.observe(this) {isLoading ->
-            showLoading(isLoading)
-        }
         viewModel.errorMessage.observe(this) { message ->
             message?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
@@ -91,14 +87,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setStories(response: StoryResponse) {
-        val story = response.listStory
-        storyAdapter.submitList(story)
+    private fun observeStory() {
+        viewModel.listStory.observe(this) { pagingData ->
+            storyAdapter.submitData(lifecycle, pagingData)
+        }
+
+        storyAdapter.addLoadStateListener { loadState ->
+            val isLoading = loadState.source.refresh is LoadState.Loading
+            showLoading(isLoading)
+        }
+    }
+
+    private fun getData() {
+        val adapter = StoryAdapter { story ->
+            story.id?.let { openDetailActivity(it) }
+        }
+
+        binding.rvStory.adapter = adapter.withLoadStateFooter(
+            footer = LoadingStateAdapter {
+                adapter.retry()
+            }
+        )
+
+        binding.rvStory.layoutManager = LinearLayoutManager(this)
+
+        viewModel.listStory.observe(this) { pagingData ->
+            adapter.submitData(lifecycle, pagingData)
+        }
+
+        adapter.addLoadStateListener { loadState ->
+            binding.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+            if (loadState.source.refresh is LoadState.Error) {
+                val error = (loadState.source.refresh as LoadState.Error).error.localizedMessage
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun openDetailActivity(storyId: String) {
         val intent = Intent(this, DetailStoryActivity::class.java)
-        intent.putExtra("CANCER_ID", storyId)
+        intent.putExtra(CANCER_ID, storyId)
         detailActivityLauncher.launch(intent)
     }
 
@@ -126,15 +154,26 @@ class MainActivity : AppCompatActivity() {
                 viewModel.logOut()
                 true
             }
+
             R.id.action_setting -> {
                 startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
                 true
             }
+            R.id.action_maps -> {
+                val intent = Intent(this, MapsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    companion object {
+        private const val CANCER_ID = "CANCER_ID"
     }
 }

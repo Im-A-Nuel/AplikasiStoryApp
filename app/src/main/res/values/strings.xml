@@ -33,4 +33,6 @@
     <string name="login_valid">Invalid login data</string>
     <string name="add_story">Add Story</string>
     <string name="detail_story">Detail Story</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="retry">retry</string>
 </resources>

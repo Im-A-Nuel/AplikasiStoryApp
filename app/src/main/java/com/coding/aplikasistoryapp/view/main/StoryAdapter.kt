@@ -1,25 +1,23 @@
 package com.coding.aplikasistoryapp.view.main
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.coding.aplikasistoryapp.R
 import com.coding.aplikasistoryapp.data.remote.response.ListStoryItem
 import com.coding.aplikasistoryapp.databinding.ItemViewStoryBinding
-import com.coding.aplikasistoryapp.view.detail.DetailStoryActivity
 
-class StoryAdapter(private val onItemClicked: (ListStoryItem) -> Unit) : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(DiffCallback) {
+class StoryAdapter(private val onItemClicked: (ListStoryItem) -> Unit) :
+    PagingDataAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(DiffCallback) {
 
-    class StoryViewHolder(private val binding: ItemViewStoryBinding) : RecyclerView.ViewHolder(binding.root) {
-        private var onItemClicked: ((ListStoryItem) -> Unit)? = null
+    class StoryViewHolder(private val binding: ItemViewStoryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(story: ListStoryItem) {
+        fun bind(story: ListStoryItem, onItemClicked: (ListStoryItem) -> Unit) {
             binding.apply {
-
                 tvTitle.text = story.name
                 tvDescription.text = story.description
 
@@ -29,12 +27,7 @@ class StoryAdapter(private val onItemClicked: (ListStoryItem) -> Unit) : ListAda
                     .error(R.drawable.ic_place_holder)
                     .into(imgItemPhoto)
 
-                root.setOnClickListener {
-                    val id = story.id
-                    val intent = Intent(it.context, DetailStoryActivity::class.java)
-                    intent.putExtra(DetailStoryActivity.EXTRA_ID, id)
-                    it.context.startActivity(intent)
-                }
+                root.setOnClickListener { onItemClicked(story) }
             }
         }
     }
@@ -47,7 +40,7 @@ class StoryAdapter(private val onItemClicked: (ListStoryItem) -> Unit) : ListAda
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
         val story = getItem(position)
         if (story != null) {
-            holder.bind(story)
+            holder.bind(story, onItemClicked)
         }
     }
 
