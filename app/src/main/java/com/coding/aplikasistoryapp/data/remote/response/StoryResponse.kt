@@ -36,7 +36,7 @@ data class ListStoryItem(
 
 	@PrimaryKey
 	@field:SerializedName("id")
-	val id: String? = null,
+	val id: String,
 
 	@field:SerializedName("lat")
 	val lat: Double

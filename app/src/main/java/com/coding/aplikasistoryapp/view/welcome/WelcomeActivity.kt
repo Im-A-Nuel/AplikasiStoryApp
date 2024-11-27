@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.coding.aplikasistoryapp.databinding.ActivityWelcomeBinding
 import com.coding.aplikasistoryapp.view.login.LoginActivity
@@ -16,6 +17,7 @@ import com.coding.aplikasistoryapp.view.register.RegisterActivity
 class WelcomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWelcomeBinding
+    private val viewModel: WelcomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +27,7 @@ class WelcomeActivity : AppCompatActivity() {
         setupView()
         setupAction()
         playAnimation()
+        observeViewModel()
     }
 
     private fun setupView() {
@@ -63,13 +66,31 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun setupAction() {
-
         binding.loginButton.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
+            viewModel.onLoginClicked()
         }
 
         binding.signupButton.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
+            viewModel.onSignupClicked()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.navigateTo.observe(this) { navigateTo ->
+            when (navigateTo) {
+                WelcomeViewModel.NavigateTo.LOGIN -> {
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    viewModel.navigationDone()
+                }
+
+                WelcomeViewModel.NavigateTo.SIGNUP -> {
+                    startActivity(Intent(this, RegisterActivity::class.java))
+                    viewModel.navigationDone()
+                }
+
+                null -> {
+                }
+            }
         }
     }
 }

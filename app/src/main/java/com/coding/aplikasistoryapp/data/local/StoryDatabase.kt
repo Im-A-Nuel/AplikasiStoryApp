@@ -12,7 +12,7 @@ import com.coding.aplikasistoryapp.data.remote.response.ListStoryItem
     exportSchema = false
 )
 
-abstract class StoryDatabase: RoomDatabase() {
+abstract class StoryDatabase : RoomDatabase() {
 
     abstract fun storyDao(): StoryDao
     abstract fun remoteKeysDao(): RemoteKeysDao

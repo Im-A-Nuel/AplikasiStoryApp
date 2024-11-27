@@ -6,7 +6,10 @@ import com.coding.aplikasistoryapp.data.StoryRepository
 import com.coding.aplikasistoryapp.data.pref.UserPreference
 import com.coding.aplikasistoryapp.data.remote.response.ListStoryItem
 
-class StoryPagingSource(private val storyRepository: StoryRepository, private  val userPreference: UserPreference): PagingSource<Int, ListStoryItem>() {
+class StoryPagingSource(
+    private val storyRepository: StoryRepository,
+    private val userPreference: UserPreference
+) : PagingSource<Int, ListStoryItem>() {
 
     override fun getRefreshKey(state: PagingState<Int, ListStoryItem>): Int? {
         return state.anchorPosition?.let { anchorPosition ->

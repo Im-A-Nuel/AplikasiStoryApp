@@ -5,6 +5,8 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
@@ -24,6 +26,7 @@ import com.coding.aplikasistoryapp.view.main.MainActivity
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+
     private val loginViewModel: LoginViewModel by viewModels {
         ViewModelFactory.getInstance(this)
     }
@@ -50,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
 
         binding.loginButton.isEnabled = false
 
-        email.addTextChangedListener{ checkFormValidity(email, password) }
+        email.addTextChangedListener { checkFormValidity(email, password) }
         password.addTextChangedListener { checkFormValidity(email, password) }
     }
 
@@ -78,21 +81,23 @@ class LoginActivity : AppCompatActivity() {
                         loginViewModel.saveSession(
                             UserModel(user.userId ?: "", user.name ?: "", user.token ?: "", true)
                         )
-                        AlertDialog.Builder(this).apply {
+                        val alertDialog = AlertDialog.Builder(this).apply {
                             setTitle("Yess!")
                             setMessage(getString(R.string.message_login))
-                            setPositiveButton("Lanjut") { _, _ ->
-                                val intent = Intent(context, MainActivity::class.java)
-                                intent.flags =
-                                    Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                                startActivity(intent)
-                                finish()
-                            }
+                            setCancelable(false)
                             create()
-                            show()
-                        }
+                        }.show()
+
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            alertDialog.dismiss()
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                            finish()
+                        }, 2000)
                     } else {
-                        Toast.makeText(this, getString(R.string.login_valid), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.login_valid), Toast.LENGTH_SHORT)
+                            .show()
                     }
                 } else {
                     Toast.makeText(this, "Login gagal ${result.message}", Toast.LENGTH_SHORT).show()
@@ -111,11 +116,15 @@ class LoginActivity : AppCompatActivity() {
         }.start()
 
         val title = ObjectAnimator.ofFloat(binding.titleTextView, View.ALPHA, 1f).setDuration(100)
-        val message = ObjectAnimator.ofFloat(binding.messageTextView, View.ALPHA, 1f).setDuration(100)
+        val message =
+            ObjectAnimator.ofFloat(binding.messageTextView, View.ALPHA, 1f).setDuration(100)
         val email = ObjectAnimator.ofFloat(binding.emailTextView, View.ALPHA, 1f).setDuration(100)
-        val emailEdit = ObjectAnimator.ofFloat(binding.emailEditTextLayout, View.ALPHA, 1f).setDuration(100)
-        val password = ObjectAnimator.ofFloat(binding.passwordTextView, View.ALPHA, 1f).setDuration(100)
-        val passwordEdit = ObjectAnimator.ofFloat(binding.passwordEditTextLayout, View.ALPHA, 1f).setDuration(100)
+        val emailEdit =
+            ObjectAnimator.ofFloat(binding.emailEditTextLayout, View.ALPHA, 1f).setDuration(100)
+        val password =
+            ObjectAnimator.ofFloat(binding.passwordTextView, View.ALPHA, 1f).setDuration(100)
+        val passwordEdit =
+            ObjectAnimator.ofFloat(binding.passwordEditTextLayout, View.ALPHA, 1f).setDuration(100)
         val loginBtn = ObjectAnimator.ofFloat(binding.loginButton, View.ALPHA, 1f).setDuration(100)
 
         AnimatorSet().apply {

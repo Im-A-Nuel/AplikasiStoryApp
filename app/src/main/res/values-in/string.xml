@@ -33,4 +33,7 @@
     <string name="login_valid">Data login tidak valid</string>
     <string name="add_story">Menambah Cerita</string>
     <string name="detail_story">Detail Cerita</string>
+    <string name="title_activity_maps">Lokasi Cerita</string>
+    <string name="retry">Ulangi</string>
+    <string name="location_now">Tambahkan lokasi saat ini (opsional)</string>
 </resources>

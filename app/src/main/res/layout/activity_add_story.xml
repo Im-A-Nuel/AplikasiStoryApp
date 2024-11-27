@@ -8,7 +8,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        tools:ignore="ScrollViewSize">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progressIndicator"
@@ -31,8 +32,10 @@
             android:contentDescription="@string/storyimage"
             app:layout_constraintBottom_toTopOf="@+id/galleryButton"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@drawable/ic_place_holder" />
 
         <Button
@@ -40,10 +43,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="36dp"
-            android:layout_marginBottom="216dp"
+            android:layout_marginTop="18dp"
             android:text="@string/gallery"
-            app:layout_constraintBottom_toTopOf="@+id/uploadButton"
-            app:layout_constraintStart_toEndOf="@+id/cameraButton" />
+            app:layout_constraintStart_toEndOf="@+id/cameraButton"
+            app:layout_constraintTop_toBottomOf="@+id/previewImageView" />
 
         <Button
             android:id="@+id/cameraButton"
@@ -67,15 +70,30 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
             android:autofillHints=""
-            android:padding="8dp"
             android:background="@drawable/edittext_border"
             android:gravity="top"
             android:hint="@string/description"
             android:inputType="text|textMultiLine"
+            android:padding="8dp"
             app:layout_constraintBottom_toTopOf="@+id/uploadButton"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/galleryButton" />
+            app:layout_constraintTop_toBottomOf="@+id/galleryButton"
+            app:layout_constraintVertical_bias="0.055" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchAddLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:checked="false"
+            android:text="@string/location_now"
+            app:layout_constraintBottom_toTopOf="@+id/uploadButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.091"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/description_text" />
 
         <Button
             android:id="@+id/uploadButton"
@@ -83,7 +101,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="24dp"
             android:text="@string/upload"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -97,10 +114,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             tools:visibility="gone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

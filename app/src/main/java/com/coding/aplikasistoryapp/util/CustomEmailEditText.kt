@@ -24,10 +24,11 @@ class CustomEmailEditText @JvmOverloads constructor(
     }
 
     private fun validateEmail(email: String) {
-        error = if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            context.getString(R.string.invalid_format_email)
-        } else {
-            null
-        }
+        error =
+            if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                context.getString(R.string.invalid_format_email)
+            } else {
+                null
+            }
     }
 }

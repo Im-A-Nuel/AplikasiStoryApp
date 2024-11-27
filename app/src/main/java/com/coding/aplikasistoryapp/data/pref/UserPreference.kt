@@ -27,7 +27,7 @@ class UserPreference private constructor(private val dataStore: DataStore<Prefer
             val userId = preferences[USER_KEY] ?: ""
             val token = preferences[TOKEN_KEY] ?: ""
             val isLogin = preferences[IS_LOGIN_KEY] ?: false
-            UserModel(userId,"" ,token, isLogin)
+            UserModel(userId, "", token, isLogin)
         }
     }
 

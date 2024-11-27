@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            observeStory()
+            storyAdapter.refresh()
         }
     }
 
@@ -56,12 +56,14 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        supportActionBar?.setHomeActionContentDescription("More options")
+
         setupObservers()
         setupView()
         getData()
 
         storyAdapter = StoryAdapter { story ->
-            story.id?.let { openDetailActivity(it) }
+            openDetailActivity(story.id)
         }
 
         binding.fabAdd.setOnClickListener {
@@ -100,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getData() {
         val adapter = StoryAdapter { story ->
-            story.id?.let { openDetailActivity(it) }
+            openDetailActivity(story.id)
         }
 
         binding.rvStory.adapter = adapter.withLoadStateFooter(
@@ -159,6 +161,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
                 true
             }
+
             R.id.action_maps -> {
                 val intent = Intent(this, MapsActivity::class.java)
                 startActivity(intent)

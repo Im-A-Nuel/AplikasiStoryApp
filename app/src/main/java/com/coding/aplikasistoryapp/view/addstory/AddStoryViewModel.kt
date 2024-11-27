@@ -4,10 +4,8 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import com.coding.aplikasistoryapp.data.StoryRepository
 import com.coding.aplikasistoryapp.data.UserRepository
-import com.coding.aplikasistoryapp.data.pref.UserModel
 import com.coding.aplikasistoryapp.data.remote.response.UploadResponse
 import java.io.File
 
@@ -25,9 +23,14 @@ class AddStoryViewModel(
     private val _description = MutableLiveData<String>()
     val description: LiveData<String> get() = _description
 
-    fun uploadImage(file: File, description: String): LiveData<UploadResponse> {
+    fun uploadImage(
+        file: File,
+        description: String,
+        latitude: Double,
+        longitude: Double
+    ): LiveData<UploadResponse> {
         try {
-            val result = storyRepository.uploadImage(file, description)
+            val result = storyRepository.uploadImage(file, description, latitude, longitude)
             uploadResult = result
         } catch (e: Exception) {
             _uploadResult.postValue(
@@ -43,7 +46,4 @@ class AddStoryViewModel(
         _description.value = description
     }
 
-    fun getSession(): LiveData<UserModel> {
-        return userRepository.getSession().asLiveData()
-    }
 }

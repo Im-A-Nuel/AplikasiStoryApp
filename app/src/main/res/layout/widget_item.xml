@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="8dp">
-
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
         android:ellipsize="end"
         android:maxLines="2"
         android:paddingTop="8dp"
-        android:text="@string/judul_cerita" />
+        android:text="@string/judul_cerita"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
         android:contentDescription="@string/storyimage"
+        android:scaleType="fitCenter"
         tools:srcCompat="@drawable/welcome_image" />
-
 
 </LinearLayout>

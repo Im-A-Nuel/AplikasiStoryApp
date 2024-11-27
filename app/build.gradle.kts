@@ -37,6 +37,10 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    testOptions {
+        animationsDisabled = true
+        unitTests.isReturnDefaultValues = true
+    }
     buildFeatures {
         viewBinding = true
         buildConfig = true
@@ -52,7 +56,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.maps)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
@@ -82,4 +88,11 @@ dependencies {
     // paging
     implementation(libs.androidx.room.paging)
 
+    // test
+    testImplementation(libs.androidx.core.testing) // InstantTaskExecutorRule
+    testImplementation(libs.kotlinx.coroutines.test) //TestDispatcher
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+
+    testImplementation(libs.kotlinx.coroutines.test.v173)
 }

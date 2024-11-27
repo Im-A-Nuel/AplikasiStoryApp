@@ -26,10 +26,11 @@ class DetailStoryActivity : AppCompatActivity() {
 
         supportActionBar?.title = getString(R.string.detail_story)
 
-        val storyId = intent.getStringExtra(EXTRA_ID)
+        val storyId = intent.getStringExtra(CANCER_ID)
         if (storyId != null) {
             if (storyId.isNotEmpty()) {
                 viewModel.getDetailStory(storyId)
+                println(storyId)
             }
         }
 
@@ -48,17 +49,19 @@ class DetailStoryActivity : AppCompatActivity() {
             }
         }
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     companion object {
-        const val EXTRA_ID = "extra_id"
+        const val CANCER_ID = "CANCER_ID"
     }
 }

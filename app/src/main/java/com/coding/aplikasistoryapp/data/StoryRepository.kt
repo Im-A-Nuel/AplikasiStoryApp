@@ -46,15 +46,16 @@ class StoryRepository private constructor(
     fun getStory(): LiveData<PagingData<ListStoryItem>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 10
+                pageSize = 10,
+                enablePlaceholders = false
             ),
-            remoteMediator = StoryRemoteMediator(storyDatabase, storyRepository = StoryRepository(apiService,userPreference,storyDatabase)),
+            remoteMediator = StoryRemoteMediator(storyDatabase, this),
             pagingSourceFactory = {
-//                QuotePagingSource(apiService)
                 storyDatabase.storyDao().getAllStory()
             }
         ).liveData
     }
+
 
     suspend fun getStoriesById(id: String): DetailResponse {
         val session = userPreference.getSession().first()
@@ -68,30 +69,40 @@ class StoryRepository private constructor(
         return apiService.getStoriesWithLocation(token)
     }
 
-    fun uploadImage(imageFile: File, description: String) = liveData<UploadResponse> {
-        val session = userPreference.getSession().first()
-        val token = "Bearer ${session.token}"
-        val requestBody = description.toRequestBody("text/plain".toMediaType())
-        val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
-        val multipartBody = MultipartBody.Part.createFormData(
-            "photo",
-            imageFile.name,
-            requestImageFile
-        )
-        try {
-            val successResponse = apiService.uploadImage(multipartBody, requestBody, token)
-            emit(successResponse)
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val errorResponse = Gson().fromJson(errorBody, UploadResponse::class.java)
-            emit(errorResponse)
+    fun uploadImage(imageFile: File, description: String, latitude: Double, longitude: Double) =
+        liveData<UploadResponse> {
+            val session = userPreference.getSession().first()
+            val token = "Bearer ${session.token}"
+            val requestBody = description.toRequestBody("text/plain".toMediaType())
+            val requestImageFile = imageFile.asRequestBody("image/jpeg".toMediaType())
+            val multipartBody = MultipartBody.Part.createFormData(
+                "photo",
+                imageFile.name,
+                requestImageFile
+            )
+
+            val latPart = latitude.toString().toRequestBody("text/plain".toMediaType())
+            val lonPart = longitude.toString().toRequestBody("text/plain".toMediaType())
+
+            try {
+                val successResponse =
+                    apiService.uploadImage(multipartBody, requestBody, token, latPart, lonPart)
+                emit(successResponse)
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+                val errorResponse = Gson().fromJson(errorBody, UploadResponse::class.java)
+                emit(errorResponse)
+            }
         }
-    }
 
     companion object {
         @Volatile
         private var instance: StoryRepository? = null
-        fun getInstance(apiService: ApiService, userPreference: UserPreference, storyDatabase: StoryDatabase): StoryRepository =
+        fun getInstance(
+            apiService: ApiService,
+            userPreference: UserPreference,
+            storyDatabase: StoryDatabase
+        ): StoryRepository =
             instance ?: synchronized(this) {
                 instance ?: StoryRepository(apiService, userPreference, storyDatabase)
             }.also { instance = it }

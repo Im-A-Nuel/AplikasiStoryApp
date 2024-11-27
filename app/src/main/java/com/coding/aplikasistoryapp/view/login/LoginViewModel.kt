@@ -11,7 +11,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class LoginViewModel(private val repository: UserRepository): ViewModel() {
+class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
     private val _loginResult = MutableLiveData<LoginResponse?>()
     val loginResult: LiveData<LoginResponse?> get() = _loginResult
@@ -35,7 +35,7 @@ class LoginViewModel(private val repository: UserRepository): ViewModel() {
                 _loginResult.postValue(errorResponse)
             } catch (e: Exception) {
                 _loginResult.postValue(LoginResponse(error = true, message = "Kesalahan jaringan"))
-            }finally {
+            } finally {
                 _isLoading.postValue(false)
             }
         }
